@@ -9,5 +9,6 @@ import scrapy
 class WikiCrawlerItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
-    title = scrapy.Field()
-    urls = scrapy.Field()
+    # title = scrapy.Field()
+    # urls = scrapy.Field()
+    pass
