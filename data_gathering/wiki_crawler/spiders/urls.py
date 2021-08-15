@@ -41,3 +41,6 @@ class UrlsSpider(scrapy.Spider):
                 )
             except pymongo.errors.DuplicateKeyError:
                 print('Key Conflict: ' + name)
+
+
+
