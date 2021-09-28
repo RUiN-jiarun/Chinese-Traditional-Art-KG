@@ -5,6 +5,10 @@ import pymongo
 # sys.path.append('../')
 from wiki_crawler.items import WikiCrawlerItem
 import zhconv
+import re
+
+def inter(a,b):
+    return list(set(a)&set(b))
 
 class MainSpider(scrapy.Spider):
     name = 'main'
@@ -15,11 +19,12 @@ class MainSpider(scrapy.Spider):
     names = []
     db_urls = db['db_urls']
     for x in db_urls.find():
-        id_strip = x['_id'][:x['_id'].find(' (')] if x['_id'].find(' (') != -1 else x['_id']
-        names.append(id_strip)
+        # id_strip = x['_id'][:x['_id'].find(' (')] if x['_id'].find(' (') != -1 else x['_id']
+        # names.append(id_strip)
+        names.append(x['_id'])
         start_urls.append(x['url'])
 
-    print(start_urls)
+    # print(start_urls)
     print(names)
 
     # 创建一个关于三元组的数据库
@@ -33,4 +38,30 @@ class MainSpider(scrapy.Spider):
     
     def parse(self, response):
         # TODO: 分析页面规则
-        pass
+        sub_name = response.xpath('/html/body/div[3]/h1/text()').getall()[0]
+        l1 = response.xpath('/html/body/div[3]/div[3]/div[5]/div[1]/table/tbody/tr/td/table/tbody/tr[1]/th/div[2]/text()').getall()
+        l2 = response.xpath('/html/body/div[3]/div[3]/div[5]/div[1]/table/tbody/tr/td/table/tbody/tr[1]/th/div[2]/a/text()').getall()
+        # print(
+        #     response.xpath('/html/body/div[3]/div[3]/div[5]/div[1]/table/tbody/tr/td/table/tbody/tr[1]/th/div[2]/text()').getall()
+        # )
+        # print(
+        #     response.xpath('/html/body/div[3]/div[3]/div[5]/div[1]/table/tbody/tr/td/table/tbody/tr[1]/th/div[2]/a/text()').getall()
+        # )
+        l1[0] = l1[0].replace("（", "")
+        l1[1] = l1[1].replace("）", "")
+        l1[0] += l1[1]
+        if l2[0][-1] == "年":
+            l2.clear()
+        sub_name = re.sub(u"\\(.*?\\)|\\{.*?}|\\[.*?]", "", sub_name)
+        sub_name = sub_name.replace(' ', '')
+        sub_name = zhconv.convert(sub_name, 'zh-hans')
+        print(sub_name)
+        print(l1)
+        print(l2)
+        allInfo = response.xpath('/html/body/div[3]/div[3]/div[5]/div[1]/table/tbody/tr/td/table/tbody//a/text()').getall()
+        for i in range(0,len(allInfo)):
+            allInfo[i] = allInfo[i].replace('\u3000', '')
+            allInfo[i] = zhconv.convert(allInfo[i], 'zh-hans')
+        # print(allInfo)
+        interset = inter(allInfo, self.names)
+        print(interset)

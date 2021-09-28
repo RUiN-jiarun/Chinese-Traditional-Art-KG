@@ -1,10 +1,15 @@
 import scrapy
 from scrapy.loader import ItemLoader
 import pymongo
-# import sys
+import sys
+import importlib
+importlib.reload(sys)
+
+# sys.setdefaultencoding('utf8')
 # sys.path.append('../')
 from wiki_crawler.items import WikiCrawlerItem
 import zhconv
+import re
 
 
 class UrlsSpider(scrapy.Spider):
@@ -31,7 +36,10 @@ class UrlsSpider(scrapy.Spider):
                                 /div[@class="mw-content-ltr"]/div[@class="mw-category"]/div[@class="mw-category-group"]/ul/li/a/@href').getall()
         for i in range(len(names)):
             name = zhconv.convert(names[i], 'zh-hans')
+            name = re.sub(u"\\(.*?\\)|\\{.*?}|\\[.*?]", "", name)
+            name = name.replace(' ', '')
             url = urls[i]
+            # print(name)
             try:
                 self.db_urls.insert_one(
                     {

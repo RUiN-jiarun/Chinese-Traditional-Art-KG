@@ -163,3 +163,18 @@ class UrlsSpider(scrapy.Spider):
 看看这个例子的页面结构：
 
 ![image-20210815102214781](https://ruin-typora.oss-cn-beijing.aliyuncs.com/image-20210815102214781.png)
+
+## 8.20
+
+分析结构，得出两种xpath
+
+```python
+l1 = response.xpath('/html/body/div[3]/div[3]/div[5]/div[1]/table/tbody/tr/td/table/tbody/tr[1]/th/div[2]/text()').getall()
+l2 = response.xpath('/html/body/div[3]/div[3]/div[5]/div[1]/table/tbody/tr/td/table/tbody/tr[1]/th/div[2]/a/text()').getall()
+```
+
+下面可能要在该属性的范围里做一些筛选
+
+用一个interset看看有没有交集
+
+快了，这样三元组的架构基本就有了
