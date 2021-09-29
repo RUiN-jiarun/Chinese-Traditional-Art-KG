@@ -39,7 +39,9 @@ class MainSpider(scrapy.Spider):
     def parse(self, response):
         # TODO: 分析页面规则
         sub_name = response.xpath('/html/body/div[3]/h1/text()').getall()[0]
-        l1 = response.xpath('/html/body/div[3]/div[3]/div[5]/div[1]/table/tbody/tr/td/table/tbody/tr[1]/th/div[2]/text()').getall()
+        l1 = response.xpath('/html/body/div[3]/div[3]/div[5]/div[1]/table/tbody/tr/td/table/tbody/tr[1]/th/div[2]').getall()
+        # 可能有多个属性，分别查找
+        attr_len = len(l1)
         l2 = response.xpath('/html/body/div[3]/div[3]/div[5]/div[1]/table/tbody/tr/td/table/tbody/tr[1]/th/div[2]/a/text()').getall()
         # print(
         #     response.xpath('/html/body/div[3]/div[3]/div[5]/div[1]/table/tbody/tr/td/table/tbody/tr[1]/th/div[2]/text()').getall()
@@ -47,11 +49,11 @@ class MainSpider(scrapy.Spider):
         # print(
         #     response.xpath('/html/body/div[3]/div[3]/div[5]/div[1]/table/tbody/tr/td/table/tbody/tr[1]/th/div[2]/a/text()').getall()
         # )
-        l1[0] = l1[0].replace("（", "")
-        l1[1] = l1[1].replace("）", "")
-        l1[0] += l1[1]
-        if l2[0][-1] == "年":
-            l2.clear()
+        # l1[0] = l1[0].replace("（", "")
+        # l1[1] = l1[1].replace("）", "")
+        # l1[0] += l1[1]
+        # if l2[0][-1] == "年":
+        #     l2.clear()
         sub_name = re.sub(u"\\(.*?\\)|\\{.*?}|\\[.*?]", "", sub_name)
         sub_name = sub_name.replace(' ', '')
         sub_name = zhconv.convert(sub_name, 'zh-hans')

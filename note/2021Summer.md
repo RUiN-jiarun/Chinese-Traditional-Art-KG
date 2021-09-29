@@ -178,3 +178,7 @@ l2 = response.xpath('/html/body/div[3]/div[3]/div[5]/div[1]/table/tbody/tr/td/ta
 用一个interset看看有没有交集
 
 快了，这样三元组的架构基本就有了
+
+## 8.25
+
+考虑用正则表达式分析一下html内容
