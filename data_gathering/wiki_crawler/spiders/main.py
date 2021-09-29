@@ -42,13 +42,8 @@ class MainSpider(scrapy.Spider):
         l1 = response.xpath('/html/body/div[3]/div[3]/div[5]/div[1]/table/tbody/tr/td/table/tbody/tr[1]/th/div[2]').getall()
         # 可能有多个属性，分别查找
         attr_len = len(l1)
-        l2 = response.xpath('/html/body/div[3]/div[3]/div[5]/div[1]/table/tbody/tr/td/table/tbody/tr[1]/th/div[2]/a/text()').getall()
-        # print(
-        #     response.xpath('/html/body/div[3]/div[3]/div[5]/div[1]/table/tbody/tr/td/table/tbody/tr[1]/th/div[2]/text()').getall()
-        # )
-        # print(
-        #     response.xpath('/html/body/div[3]/div[3]/div[5]/div[1]/table/tbody/tr/td/table/tbody/tr[1]/th/div[2]/a/text()').getall()
-        # )
+
+
         # l1[0] = l1[0].replace("（", "")
         # l1[1] = l1[1].replace("）", "")
         # l1[0] += l1[1]
@@ -59,11 +54,12 @@ class MainSpider(scrapy.Spider):
         sub_name = zhconv.convert(sub_name, 'zh-hans')
         print(sub_name)
         print(l1)
-        print(l2)
-        allInfo = response.xpath('/html/body/div[3]/div[3]/div[5]/div[1]/table/tbody/tr/td/table/tbody//a/text()').getall()
-        for i in range(0,len(allInfo)):
-            allInfo[i] = allInfo[i].replace('\u3000', '')
-            allInfo[i] = zhconv.convert(allInfo[i], 'zh-hans')
-        # print(allInfo)
-        interset = inter(allInfo, self.names)
-        print(interset)
+        print(attr_len)
+        for i in range(0, attr_len):
+            allInfo = response.xpath('/html/body/div[3]/div[3]/div[5]/div[1]/table[@class="navbox"]['+str(i)+']//a/text()').getall()
+            for i in range(0,len(allInfo)):
+                allInfo[i] = allInfo[i].replace('\u3000', '')
+                allInfo[i] = zhconv.convert(allInfo[i], 'zh-hans')
+            # print(allInfo)
+            interset = inter(allInfo, self.names)
+            print(interset)

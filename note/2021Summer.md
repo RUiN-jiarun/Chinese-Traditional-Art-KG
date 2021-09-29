@@ -182,3 +182,16 @@ l2 = response.xpath('/html/body/div[3]/div[3]/div[5]/div[1]/table/tbody/tr/td/ta
 ## 8.25
 
 考虑用正则表达式分析一下html内容
+
+*另外需要考虑：多个属性怎么查找？*
+
+比如：
+
+/html/body/div[3]/div[3]/div[5]/div[1]/table[1]
+
+```
+/html/body/div[3]/div[3]/div[5]/div[1]/table[2]
+/html/body/div[3]/div[3]/div[5]/div[1]/table[3]
+```
+
+下一步：从正则表达式中提取文字信息
