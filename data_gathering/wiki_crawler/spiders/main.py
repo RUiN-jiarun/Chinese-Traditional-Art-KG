@@ -37,10 +37,9 @@ class MainSpider(scrapy.Spider):
     def parse(self, response):
         # TODO: 分析页面规则
         sub_name = response.xpath('/html/body/div[3]/h1/text()').getall()[0]
-        l1 = response.xpath('/html/body/div[3]/div[3]/div[5]/div[1]/table/tbody/tr/td/table/tbody/tr[1]/th/div[2]').getall()
+        attr = response.xpath('/html/body/div[3]/div[3]/div[5]/div[1]/table/tbody/tr/td/table/tbody/tr[1]/th/div[2]').getall()
         # 可能有多个属性，分别查找
-        attr_len = len(l1)
-
+        attr_len = len(attr)
 
         # l1[0] = l1[0].replace("（", "")
         # l1[1] = l1[1].replace("）", "")
@@ -51,13 +50,20 @@ class MainSpider(scrapy.Spider):
         sub_name = sub_name.replace(' ', '')
         sub_name = zhconv.convert(sub_name, 'zh-hans')
         print(sub_name)
-        print(l1)
-        print(attr_len)
         for i in range(0, attr_len):
+            attr[i] = re.sub('<(\S*?)[^>]*>.*?|<.*? />', '', attr[i])
+            attr[i] = zhconv.convert(attr[i], 'zh-hans')
+        print(attr)
+        # print(attr_len)
+        for i in range(1, attr_len+1):
+
             allInfo = response.xpath('/html/body/div[3]/div[3]/div[5]/div[1]/table[@class="navbox"]['+str(i)+']//a/text()').getall()
             for i in range(0,len(allInfo)):
                 allInfo[i] = allInfo[i].replace('\u3000', '')
                 allInfo[i] = zhconv.convert(allInfo[i], 'zh-hans')
             # print(allInfo)
             interset = inter(allInfo, self.names)
+            if sub_name in interset:
+                interset.remove(sub_name)
             print(interset)
+        

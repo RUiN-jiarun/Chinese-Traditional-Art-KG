@@ -200,4 +200,5 @@ l2 = response.xpath('/html/body/div[3]/div[3]/div[5]/div[1]/table/tbody/tr/td/ta
 <(\S*?)[^>]*>.*?|<.*? />
 ```
 
-用上面这个来删除标签信息
+用上面这个来删除标签信息  
+
