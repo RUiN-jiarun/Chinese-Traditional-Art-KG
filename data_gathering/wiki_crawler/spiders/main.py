@@ -23,7 +23,7 @@ class MainSpider(scrapy.Spider):
         start_urls.append(x['url'])
 
     # print(start_urls)
-    print(names)
+    # print(names)
 
     # 创建一个关于三元组的数据库
     db_triples = db['db_triples']
@@ -58,12 +58,26 @@ class MainSpider(scrapy.Spider):
         for i in range(1, attr_len+1):
 
             allInfo = response.xpath('/html/body/div[3]/div[3]/div[5]/div[1]/table[@class="navbox"]['+str(i)+']//a/text()').getall()
-            for i in range(0,len(allInfo)):
-                allInfo[i] = allInfo[i].replace('\u3000', '')
-                allInfo[i] = zhconv.convert(allInfo[i], 'zh-hans')
+            for k in range(0,len(allInfo)):
+                allInfo[k] = allInfo[k].replace('\u3000', '')
+                allInfo[k] = zhconv.convert(allInfo[k], 'zh-hans')
             # print(allInfo)
             interset = inter(allInfo, self.names)
             if sub_name in interset:
                 interset.remove(sub_name)
             print(interset)
+            for j in interset:
+                try:
+                    print('insert!')
+                    self.db_triples.insert_one(
+                        {
+                            '_id': sub_name + '_' + attr[i-1] + '_' + interset[j],
+                            'sub_name': sub_name,
+                            'attr': attr[i-1],
+                            'obj_name': interset[j]
+                        }
+                    )
+                except pymongo.errors.DuplicateKeyError:
+                    print('Key Conflict')
+
         
