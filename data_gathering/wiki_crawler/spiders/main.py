@@ -1,8 +1,6 @@
 import scrapy
 from scrapy.loader import ItemLoader
 import pymongo
-# import sys
-# sys.path.append('../')
 from wiki_crawler.items import WikiCrawlerItem
 import zhconv
 import re
