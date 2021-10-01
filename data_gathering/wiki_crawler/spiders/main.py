@@ -67,14 +67,22 @@ class MainSpider(scrapy.Spider):
                 interset.remove(sub_name)
             print(interset)
             for j in interset:
+                # self.db_triples.insert_one(
+                #         {
+                #             '_id': sub_name + '_' + attr[i-1] + '_' + interset[j],
+                #             'sub_name': sub_name,
+                #             'attr': attr[i-1],
+                #             'obj_name': interset[j]
+                #         }
+                #     )
                 try:
                     print('insert!')
                     self.db_triples.insert_one(
                         {
-                            '_id': sub_name + '_' + attr[i-1] + '_' + interset[j],
+                            '_id': sub_name + '_' + attr[i-1] + '_' + j,
                             'sub_name': sub_name,
                             'attr': attr[i-1],
-                            'obj_name': interset[j]
+                            'obj_name': j
                         }
                     )
                 except pymongo.errors.DuplicateKeyError:
