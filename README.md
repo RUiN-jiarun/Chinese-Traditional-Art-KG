@@ -22,4 +22,7 @@ $ neo4j console
 
 ![image-20211003155620654](https://ruin-typora.oss-cn-beijing.aliyuncs.com/image-20211003155620654.png)
 
-TODO：一些数据库插入语法的错误
+好了现在是有一个结果了
+
+<img src="https://ruin-typora.oss-cn-beijing.aliyuncs.com/graph.png" alt="graph" style="zoom:50%;" />
+

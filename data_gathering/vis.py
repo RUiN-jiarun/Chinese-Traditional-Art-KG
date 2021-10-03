@@ -1,6 +1,7 @@
 import scrapy
 import pymongo
 from neo4j import GraphDatabase
+import neo4j
 import re
 
 driver = GraphDatabase.driver("bolt://localhost:7687", auth=("neo4j", "123"), encrypted=False)
@@ -18,9 +19,13 @@ if __name__ == '__main__':
     for x in db.find():
         entity = x['sub_name']
         attr = x['attr']
+        attr = attr.replace('（', '')
+        attr = attr.replace('）', '')
         val = x['obj_name']
-
-        with driver.session() as session:
-            session.write_transaction(
-                add_node, entity, attr, val
-            )
+        try:
+            with driver.session() as session:
+                session.write_transaction(
+                    add_node, entity, attr, val
+                )
+        except neo4j.exceptions.CypherSyntaxError:
+            print('Syntax Error')
