@@ -7,7 +7,7 @@ driver = GraphDatabase.driver("bolt://localhost:7687", auth=("neo4j", "123"), en
 
 db = pymongo.MongoClient("mongodb://127.0.0.1:27017/")["db_wikikg"]["db_triples"]
 
-def add_node(self, tx, name1, relation, name2):
+def add_node(tx, name1, relation, name2):
         tx.run("MERGE (a:Node {name: $name1}) "
                "MERGE (b:Node {name: $name2}) "
                "MERGE (a)-[:"+relation+"]-> (b)",
@@ -15,7 +15,12 @@ def add_node(self, tx, name1, relation, name2):
 
 if __name__ == '__main__':
     # TODO: 从数据库中读取entity attr val
-    with driver.session() as session:
-        session.write_transaction(
-            add_node, entity, attr, val
-        )
+    for x in db.find():
+        entity = x['sub_name']
+        attr = x['attr']
+        val = x['obj_name']
+
+        with driver.session() as session:
+            session.write_transaction(
+                add_node, entity, attr, val
+            )

@@ -9,3 +9,17 @@ For graduation
 ## 阶段1学习
 
 在暑假学习记录的基础上先测试一下知识图谱的构建
+
+需要启动neo4j
+
+```bash
+$ neo4j console
+```
+
+然后浏览器输入`http://localhost:7474/browser/`
+
+经过测试后，有了一个例子的输出：
+
+![image-20211003155620654](https://ruin-typora.oss-cn-beijing.aliyuncs.com/image-20211003155620654.png)
+
+TODO：一些数据库插入语法的错误
