@@ -54,7 +54,7 @@ $ neo4j console
 
 ![image-20211007095212220](https://ruin-typora.oss-cn-beijing.aliyuncs.com/image-20211007095212220.png)
 
-* 提名
+* 题名
 * 书体
 * 年代
 * 作者
@@ -66,7 +66,10 @@ $ neo4j console
 
 *10.8进展：获得了该网站所有作者信息，下一步进行数据清洗与深度收集*
 
-- [ ] 获得链接的格式  
+- [x] 获得链接的格式  
 * 例如：`http://g2.ltfc.net/suhaindex?author=张大千&current=1&pageSize=12`
+
+- [ ] 链接清洗
 - [ ] 数据收集
 - [ ] 灌到数据库里
+
