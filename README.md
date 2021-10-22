@@ -69,7 +69,7 @@ $ neo4j console
 - [x] 获得链接的格式  
 * 例如：`http://g2.ltfc.net/suhaindex?author=张大千&current=1&pageSize=12`
 
-- [ ] 链接清洗
-- [ ] 数据收集
+- [x] 链接清洗
+- [x] 数据收集
 - [ ] 灌到数据库里
 
