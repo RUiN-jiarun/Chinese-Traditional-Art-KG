@@ -5,3 +5,4 @@ webpages/*
 *.txt
 *.log
 spider_pics/
+node_modules/
