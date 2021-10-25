@@ -391,17 +391,17 @@ export default {
       this.selection.nodes = [];
       this.selection.links = [];
     },
-    zoomed() {
+    zoomed(event) {
       // var transform = d3.zoomTransform(this);
       // 缩放中：以鼠标所在的位置为中心
       d3.select("#container").attr(
         "transform",
         "translate(" +
-          d3.zoom.transform.x +
+          event.transform.x +
           "," +
-          d3.zoom.transform.y +
+          event.transform.y +
           ") scale(" +
-          d3.zoom.transform.k +
+          event.transform.k +
           ")"
       );
     },
