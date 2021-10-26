@@ -1,5 +1,8 @@
 <template>
-  <div id="network" :style="{width: svgSize.width +'px', height: svgSize.height+'px'}">
+  <div
+    id="network"
+    :style="{ width: svgSize.width + 'px', height: svgSize.height + 'px' }"
+  >
     <div
       class="linkText"
       :style="linkTextPosition"
@@ -7,11 +10,9 @@
       v-text="linkTextContent"
     ></div>
     <svg
-      xmlns="http://www.w3.org/2000/svg"
-      xmlns:xlink="http://www.w3.org/1999/xlink"
       :width="svgSize.width"
       :height="svgSize.height"
-      :style="{'background-color': theme.bgcolor}"
+      :style="{ 'background-color': theme.bgcolor }"
       @click="clickEle"
       @mouseover.prevent="svgMouseover"
       @mouseout="svgMouseout"
@@ -20,10 +21,18 @@
         <!-- links and link-text 注：先绘制边 -->
         <g>
           <g v-for="link in links" :key="link.index">
+            <defs>
+              <marker id="arrowhead" markerWidth="10" markerHeight="7" 
+               refY="2" orient="auto" 
+              :refX="nodeSize">
+                <polygon points="0 0, 4 2, 0 4" :fill="theme.linkStroke"/>
+              </marker>
+            </defs>
             <line
               :class="`${link[linkTypeKey]} ${link.selected} link element`"
               :stroke="theme.linkStroke"
               :stroke-width="linkWidth"
+              marker-end="url(#arrowhead)" 
             ></line>
             <!-- dx dy 文字左下角坐标 -->
             <text
@@ -33,7 +42,9 @@
               class="link-text"
               :fill="theme.textFill"
               :font-size="linkTextFrontSize"
-            >{{link[linkTextKey]}}</text>
+            >
+              {{ link[linkTextKey] }}
+            </text>
           </g>
         </g>
 
@@ -42,9 +53,15 @@
           <g v-for="node in nodes" :key="node.index">
             <circle
               :fill="nodeColor(node[nodeTypeKey])"
-              :stroke-width="highlightNodes.indexOf(node.id) == -1? 3:10"
-              :stroke="highlightNodes.indexOf(node.id) == -1? theme.nodeStroke: 'gold' "
-              :class="`${node[nodeTypeKey]} ${node.showText?'selected' : ''} node element`"
+              :stroke-width="highlightNodes.indexOf(node.id) == -1 ? 3 : 10"
+              :stroke="
+                highlightNodes.indexOf(node.id) == -1
+                  ? theme.nodeStroke
+                  : 'gold'
+              "
+              :class="`${node[nodeTypeKey]} ${
+                node.showText ? 'selected' : ''
+              } node element`"
               :r="nodeSize"
             ></circle>
             <text
@@ -54,9 +71,10 @@
               class="node-text"
               :fill="theme.textFill"
               :font-size="nodeTextFontSize"
-            >{{node[nodeTextKey]}}</text>
+            >
+              {{ node[nodeTextKey] }}
+            </text>
           </g>
-          <g></g>
         </g>
       </g>
     </svg>
@@ -77,44 +95,44 @@ export default {
     // node
     nodeSize: {
       type: Number,
-      default: 14
+      default: 14,
     },
     nodeTextKey: {
       type: String,
-      default: "id"
+      default: "id",
     },
     nodeTypeKey: {
       type: String,
-      default: "group"
+      default: "group",
     },
     nodeTextFontSize: {
       type: Number,
-      default: 14
+      default: 14,
     },
     // link
     linkWidth: {
       type: Number,
-      default: 2
+      default: 2,
     },
     showLinkText: {
       type: Boolean,
-      default: false
+      default: false,
     },
     linkTextKey: {
       type: String,
-      default: "value"
+      default: "value",
     },
     linkTypeKey: {
       type: String,
-      default: "type"
+      default: "type",
     },
     linkTextFrontSize: {
       type: Number,
-      default: 10
+      default: 10,
     },
     linkDistance: {
       type: Number,
-      default: 50
+      default: 50,
     },
     // svg
     svgSize: {
@@ -122,31 +140,32 @@ export default {
       default: () => {
         return {
           width: window.innerWidth,
-          height: window.innerHeight
+          height: window.innerHeight,
         };
-      }
+      },
     },
     svgTheme: {
       type: String,
-      default: "dark" // dark or light
+      default: "dark", // dark or light
     },
     bodyStrength: {
       type: Number,
-      default: -150
+      default: -150,
     },
     // others
     highlightNodes: {
       type: Array,
       default: () => {
         return [];
-      }
-    }
+      },
+    },
   },
+
   data() {
     return {
       selection: {
         links: [],
-        nodes: []
+        nodes: [],
       },
       pinned: [], // 被订住的节点的下标
       force: null,
@@ -155,17 +174,18 @@ export default {
       linkTextVisible: false,
       linkTextPosition: {
         top: 0,
-        left: 0
+        left: 0,
       },
-      linkTextContent: ""
+      linkTextContent: "",
     };
   },
+
   computed: {
     nodes() {
       // 去重
       let nodes = this.nodeList.slice();
       let nodeIds = [];
-      nodes = nodes.filter(node => {
+      nodes = nodes.filter((node) => {
         if (nodeIds.indexOf(node.id) === -1) {
           nodeIds.push(node.id);
           return true;
@@ -175,58 +195,60 @@ export default {
       });
       return nodes;
     },
+
     links() {
       return this.linkList;
     },
+
     theme() {
       if (this.svgTheme === "light") {
         return {
           bgcolor: "white",
           nodeStroke: "white",
           linkStroke: "lightgray",
-          textFill: "black"
+          textFill: "black",
         };
       } else {
-        // dark
         return {
           bgcolor: "black",
           nodeStroke: "white",
           linkStroke: "rgba(200,200,200)",
-          textFill: "white"
+          textFill: "white",
         };
       }
-    }
+    },
   },
+
   watch: {
-    bodyStrength: function() {
+    bodyStrength: function () {
       this.initData();
-      this.$nextTick(function() {
+      this.$nextTick(function () {
         this.initDragTickZoom();
       });
     },
-    linkDistance: function() {
+    linkDistance: function () {
       this.initData();
-      this.$nextTick(function() {
+      this.$nextTick(function () {
         this.initDragTickZoom();
       });
     },
-    nodes: function() {
+    nodes: function () {
       this.initData();
-      // this.$nextTick(function() {
-      //   // 以下这个函数重新在 node 上调用了拖拽
-      //   // 只有在 mounted 后才有用
-      //   // 所以要使用 $nextTick
-      //   this.initDragTickZoom();
-      // });
+      this.$nextTick(function () {
+        this.initDragTickZoom();
+      });
       this.initDragTickZoom();
-    }
+    },
   },
+
   created() {
     this.initData();
   },
+
   mounted() {
     this.initDragTickZoom();
   },
+
   methods: {
     initData() {
       this.force = d3
@@ -235,10 +257,10 @@ export default {
           "link",
           d3
             .forceLink(this.links)
-            .id(d => d.id)
+            .id((d) => d.id)
             .distance(this.linkDistance)
         )
-        .force("charge", d3.forceManyBody().strength(this.bodyStrength)) //The strength of the attraction or repulsion
+        .force("charge", d3.forceManyBody().strength(this.bodyStrength)) // The strength of the attraction or repulsion
         .force(
           "center",
           d3.forceCenter(this.svgSize.width / 2, this.svgSize.height / 2)
@@ -246,6 +268,7 @@ export default {
       // console.log(this.nodes);
       // console.log(this.links);
     },
+
     initDragTickZoom() {
       // 给节点添加拖拽
       d3.selectAll(".node").call(this.drag(this.force));
@@ -253,34 +276,34 @@ export default {
         // 更新连线坐标
         d3.selectAll(".link")
           .data(this.links)
-          .attr("x1", d => d.source.x)
-          .attr("y1", d => d.source.y)
-          .attr("x2", d => d.target.x)
-          .attr("y2", d => d.target.y);
+          .attr("x1", (d) => d.source.x)
+          .attr("y1", (d) => d.source.y)
+          .attr("x2", (d) => d.target.x)
+          .attr("y2", (d) => d.target.y);
         // 更新节点坐标
         d3.selectAll(".node")
           .data(this.nodes)
-          .attr("cx", d => d.x)
-          .attr("cy", d => d.y);
+          .attr("cx", (d) => d.x)
+          .attr("cy", (d) => d.y);
         // 更新文字坐标
         d3.selectAll(".node-text")
           .data(this.nodes)
-          .attr("x", d => d.x)
-          .attr("y", d => d.y);
+          .attr("x", (d) => d.x)
+          .attr("y", (d) => d.y);
         d3.selectAll(".link-text")
           .data(this.links)
-          .attr("x", d => (d.source.x + d.target.x) / 2)
-          .attr("y", d => (d.source.y + d.target.y) / 2);
+          .attr("x", (d) => (d.source.x + d.target.x) / 2)
+          .attr("y", (d) => (d.source.y + d.target.y) / 2);
       });
       // 初始化 zoom
       this.zoom.scaleExtent([0.1, 4]).on("zoom", this.zoomed);
-      d3.select("svg")
-        .call(this.zoom)
-        .on("dblclick.zoom", null);
+      d3.select("svg").call(this.zoom).on("dblclick.zoom", null);
     },
+
     clickLink(e) {
       this.$emit("clickLink", e, e.target.__data__);
     },
+
     clickNode(e) {
       if (this.pinned.length === 0) {
         this.pinnedState(e);
@@ -290,6 +313,7 @@ export default {
       }
       this.$emit("clickNode", e, e.target.__data__);
     },
+
     clickEle(e) {
       if (e.target.tagName === "circle") {
         this.clickNode(e);
@@ -297,6 +321,7 @@ export default {
         this.clickLink(e);
       }
     },
+
     svgMouseover(e) {
       if (e.target.nodeName === "circle") {
         if (this.pinned.length === 0) {
@@ -309,13 +334,14 @@ export default {
         // 显示关系文本
         this.linkTextPosition = {
           left: e.clientX + "px",
-          top: e.clientY - 50 + "px"
+          top: e.clientY - 50 + "px",
         };
         this.linkTextContent = e.target.__data__[this.linkTextKey];
         this.linkTextVisible = true;
         this.$emit("hoverLink", e, e.target.__data__);
       }
     },
+
     svgMouseout(e) {
       this.linkTextVisible = false;
       if (e.target.nodeName === "circle") {
@@ -326,6 +352,7 @@ export default {
         this.$forceUpdate();
       }
     },
+
     selectedState(e) {
       // 节点自身显示文字、增加 selected class、添加进 selection
       e.target.__data__.showText = true;
@@ -336,6 +363,7 @@ export default {
       // 除了 selected 的其余节点透明度减小
       d3.selectAll(".element").style("opacity", 0.2);
     },
+
     noSelectedState(e) {
       // 节点自身不显示文字、移除 selected class
       e.target.__data__.showText = false;
@@ -345,12 +373,14 @@ export default {
       // 所有节点透明度恢复
       d3.selectAll(".element").style("opacity", 1);
     },
+
     pinnedState(e) {
       this.pinned.push(e.target.__data__.index);
       d3.selectAll(".element").style("opacity", 0.05);
     },
+
     lightNeibor(node) {
-      this.links.forEach(link => {
+      this.links.forEach((link) => {
         if (link.source.index === node.index) {
           link.selected = "selected";
           this.selection.links.push(link);
@@ -365,23 +395,25 @@ export default {
         }
       });
     },
+
     lightNode(selectedNode) {
-      this.nodes.forEach(node => {
+      this.nodes.forEach((node) => {
         if (node.index === selectedNode.index) {
           node.showText = true;
         }
       });
     },
+
     darkenNerbor() {
-      this.links.forEach(link => {
-        this.selection.links.forEach(selectedLink => {
+      this.links.forEach((link) => {
+        this.selection.links.forEach((selectedLink) => {
           if (selectedLink.id === link.id) {
             link.selected = "";
           }
         });
       });
-      this.nodes.forEach(node => {
-        this.selection.nodes.forEach(selectednode => {
+      this.nodes.forEach((node) => {
+        this.selection.nodes.forEach((selectednode) => {
           if (selectednode.id === node.id) {
             node.showText = false;
           }
@@ -391,6 +423,7 @@ export default {
       this.selection.nodes = [];
       this.selection.links = [];
     },
+
     zoomed(event) {
       // var transform = d3.zoomTransform(this);
       // 缩放中：以鼠标所在的位置为中心
@@ -405,6 +438,7 @@ export default {
           ")"
       );
     },
+
     drag(simulation) {
       function dragstarted(event, d) {
         // console.log('start');
@@ -426,8 +460,8 @@ export default {
         .on("start", dragstarted)
         .on("drag", dragged)
         .on("end", dragended);
-    }
-  }
+    },
+  },
 };
 </script>
 
