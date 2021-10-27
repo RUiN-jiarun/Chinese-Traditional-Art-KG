@@ -9,6 +9,7 @@
       v-show="linkTextVisible"
       v-text="linkTextContent"
     ></div>
+
     <svg
       :width="svgSize.width"
       :height="svgSize.height"
@@ -83,14 +84,29 @@
         </g>
       </g>
 
-      <g id="legend-container">
+
+        <g id="legend"
+          transform="translate(50,600)">
           <g v-for="legend in legends" :key="legend.index">
-              <text :dy="legends.indexOf(legend) * 15">
-                  {{ legend.group }}
-              </text>
+            <rect
+              width=25
+              height=20
+              :y="legends.indexOf(legend) * 30"
+              :fill="nodeColor(legend[nodeTypeKey])"
+              stroke-width=15
+              ></rect> 
+              <text
+               dx=30
+               :y="legends.indexOf(legend) * 30 + 17"
+               :fill="theme.textFill"
+               font-size=18>
+               {{ legend.group }}</text>
+              
           </g>
-      </g>
+        </g>
+
     </svg>
+    
   </div>
   <!-- </div> -->
 </template>
@@ -184,7 +200,7 @@ export default {
       pinned: [], // 被订住的节点的下标
       force: null,
       zoom: d3.zoom(),
-      nodeColor: d3.scaleOrdinal(d3.schemeCategory10),
+      nodeColor: d3.scaleSequential().domain([0, 3.5 * Math.PI]).interpolator(d3.interpolateRainbow),
       linkTextVisible: false,
       linkTextPosition: {
         top: 0,
@@ -534,5 +550,18 @@ svg {
   border-radius: 10px;
   color: white;
   padding: 10px;
+}
+.legendText {
+  top: 120px;
+  left: 75px;
+  position: absolute;
+  z-index: 10;
+  background-color: rgba(75, 75, 75, 0.596);
+  border-radius: 10px;
+  font-size: 14px;
+  color: white;
+  padding: 10px;
+  width: 100px;
+  height: relative;
 }
 </style>
