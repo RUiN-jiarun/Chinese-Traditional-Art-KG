@@ -22,17 +22,22 @@
         <g>
           <g v-for="link in links" :key="link.index">
             <defs>
-              <marker id="arrowhead" markerWidth="10" markerHeight="7" 
-               refY="2" orient="auto" 
-              :refX="nodeSize">
-                <polygon points="0 0, 4 2, 0 4" :fill="theme.linkStroke"/>
+              <marker
+                id="arrowhead"
+                markerWidth="10"
+                markerHeight="7"
+                refY="2"
+                orient="auto"
+                :refX="nodeSize"
+              >
+                <polygon points="0 0, 4 2, 0 4" :fill="theme.linkStroke" />
               </marker>
             </defs>
             <line
               :class="`${link[linkTypeKey]} ${link.selected} link element`"
               :stroke="theme.linkStroke"
               :stroke-width="linkWidth"
-              marker-end="url(#arrowhead)" 
+              marker-end="url(#arrowhead)"
             ></line>
             <!-- dx dy 文字左下角坐标 -->
             <text
@@ -76,6 +81,14 @@
             </text>
           </g>
         </g>
+      </g>
+
+      <g id="legend-container">
+          <g v-for="legend in legends" :key="legend.index">
+              <text :dy="legends.indexOf(legend) * 15">
+                  {{ legend.group }}
+              </text>
+          </g>
       </g>
     </svg>
   </div>
@@ -166,6 +179,7 @@ export default {
       selection: {
         links: [],
         nodes: [],
+        legends: [],
       },
       pinned: [], // 被订住的节点的下标
       force: null,
@@ -182,62 +196,87 @@ export default {
 
   computed: {
     nodes() {
-      // 去重
-      let nodes = this.nodeList.slice();
-      let nodeIds = [];
-      nodes = nodes.filter((node) => {
-        if (nodeIds.indexOf(node.id) === -1) {
-          nodeIds.push(node.id);
-          return true;
-        } else {
-          return false;
-        }
-      });
-      return nodes;
+        // 去重
+        let nodes = this.nodeList.slice();
+        let nodeIds = [];
+        nodes = nodes.filter((node) => {
+            if (nodeIds.indexOf(node.id) === -1) {
+            nodeIds.push(node.id);
+            return true;
+            } else {
+            return false;
+            }
+        });
+        return nodes;
     },
 
     links() {
-      return this.linkList;
+        return this.linkList;
+    },
+
+    legends() {
+        let nodes = sortKey(this.nodeList, "group");
+        // console.log(nodes);
+        let deWeight = () => {
+            let map = new Map();
+            for (let item of nodes) {
+                if (!map.has(item.group)) {
+                    map.set(item.group, item);
+                }
+            }
+            return [...map.values()];
+        }
+        let nodeGroups = deWeight();
+        console.log(nodeGroups);
+        // nodes = nodes.filter((node) => {
+        //     if (nodeGroups.indexOf(node.group) === -1) {
+        //     nodeGroups.push(node.group);
+        //     return true;
+        //     } else {
+        //     return false;
+        //     }
+        // });
+        return nodeGroups;
     },
 
     theme() {
-      if (this.svgTheme === "light") {
-        return {
-          bgcolor: "white",
-          nodeStroke: "white",
-          linkStroke: "lightgray",
-          textFill: "black",
-        };
-      } else {
-        return {
-          bgcolor: "black",
-          nodeStroke: "white",
-          linkStroke: "rgba(200,200,200)",
-          textFill: "white",
-        };
-      }
+        if (this.svgTheme === "light") {
+            return {
+            bgcolor: "white",
+            nodeStroke: "white",
+            linkStroke: "lightgray",
+            textFill: "black",
+            };
+        } else {
+            return {
+            bgcolor: "black",
+            nodeStroke: "white",
+            linkStroke: "rgba(200,200,200)",
+            textFill: "white",
+            };
+        }
     },
   },
 
   watch: {
     bodyStrength: function () {
-      this.initData();
-      this.$nextTick(function () {
-        this.initDragTickZoom();
-      });
+        this.initData();
+        this.$nextTick(function () {
+            this.initDragTickZoom();
+        });
     },
     linkDistance: function () {
-      this.initData();
-      this.$nextTick(function () {
-        this.initDragTickZoom();
-      });
+        this.initData();
+        this.$nextTick(function () {
+            this.initDragTickZoom();
+        });
     },
     nodes: function () {
-      this.initData();
-      this.$nextTick(function () {
+        this.initData();
+        this.$nextTick(function () {
+            this.initDragTickZoom();
+        });
         this.initDragTickZoom();
-      });
-      this.initDragTickZoom();
     },
   },
 
@@ -441,6 +480,7 @@ export default {
 
     drag(simulation) {
       function dragstarted(event, d) {
+        console.log(d);
         // console.log('start');
         if (!event.active) simulation.alphaTarget(0.3).restart();
         d.fx = d.x;
@@ -452,8 +492,8 @@ export default {
       }
       function dragended(event, d) {
         if (!event.active) simulation.alphaTarget(0);
-        d.fx = null;
-        d.fy = null;
+        d.fx = event.x;
+        d.fy = event.y;
       }
       return d3
         .drag()
@@ -463,6 +503,14 @@ export default {
     },
   },
 };
+
+function sortKey(array, key) {
+    return array.sort(function(a,b){
+     var x = a[key];
+     var y = b[key];
+     return ((x<y)?-1:(x>y)?1:0)
+    })
+}
 </script>
 
 <style scoped>
