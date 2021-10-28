@@ -18,6 +18,10 @@
       <div>
         <el-switch v-model="svgTheme" active-text="黑暗模式" inactive-text="明亮模式"></el-switch>
       </div>
+      <br>
+      <div>
+        <el-switch v-model="allShow" active-text="显示所有信息" inactive-text="隐藏节点信息"></el-switch>
+      </div>
     </el-card>
     <network
       :nodeList="nodes"
@@ -26,6 +30,7 @@
       :linkWidth="linkWidth"
       :linkDistance="linkDistance"
       :svgTheme="svgTheme?'dark':'light'"
+      :allShow="allShow?true:false"
       :bodyStrength="bodyStrength"
     ></network>
   </div>
@@ -49,6 +54,7 @@ export default {
       linkDistance: 50,
       bodyStrength: -150,
       svgTheme: false, // light
+      allShow: false,
     };
   },
   created() {

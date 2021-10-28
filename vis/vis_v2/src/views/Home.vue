@@ -1,7 +1,7 @@
 <template>
   <div class="home">
-    <h2>力向导图示例</h2>
-    <ForceDirected id="mytest"  :nodes="nodes" :edges="edges"></ForceDirected>
+    <!-- <h2>力向导图示例</h2> -->
+    <ForceDirected id="mytest"  :nodes="nodes" :links="links"></ForceDirected>
   </div>
 </template>
 
@@ -30,7 +30,7 @@ export default {
         { name: "SIGGRAPH" },
       ],
       // 边集
-      edges : [
+      links : [
         { source: 0, target: 4, relation: "学生", value: 1 },
         { source: 0, target: 2, relation: "学生", value: 2 },
         { source: 0, target: 3, relation: "学生", value: 1 },

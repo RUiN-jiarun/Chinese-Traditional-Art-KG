@@ -1,6 +1,13 @@
 <template> 
-  <svg :id="id" :width="width" :height="height" />  
+  <svg 
+    :id="id" 
+    :width="width" 
+    :height="height" 
+    @mouseover.prevent="svgMouseover"
+    @mouseout="svgMouseout"
+  />  
 </template>
+
 <script>
 import * as d3 from "d3";
 
@@ -17,24 +24,37 @@ export default {
       default: String(window.innerHeight),
     },
     nodes: Array,
-    edges: Array,
+    links: Array,
     strength: {
       type: Number,
-      default: -150,
-    }
+      default: -200,
+    },
+    fontSize: {
+      type: String,
+      default: "12px",
+    },
   },
+
   data() {
-    return {      
+    return {
+      selection: {
+        links: [],
+        nodes: [],
+      },
+      pinned: [],     
     };
   },
+
   mounted() {
     this.init();
   },
+
   watch: {
     load() {
       this.init();
     },
   },
+
   methods: {
     init() {
       // let marge = { top: 30, bottom: 30, left: 30, right: 30 };
@@ -47,7 +67,7 @@ export default {
       // 节点集
       let nodes = this.nodes;
       // 边集
-      let edges = this.edges;
+      let links = this.links;
       // 设置一个颜色比例尺
       let colorScale = d3
         .scaleOrdinal()
@@ -64,7 +84,7 @@ export default {
       // 生成边数据
       forceSimulation
         .force("link")
-        .links(edges)
+        .links(links)
         .distance(function (d) {
           // 每一边的长度
           return 150 / d.value ;
@@ -79,10 +99,10 @@ export default {
         .force("charge", d3.forceManyBody().strength(this.strength));
         
       // 绘制边
-      let links = g
+      let glinks = g
         .append("g")
         .selectAll("line")
-        .data(edges)
+        .data(links)
         .enter()
         .append("line")
         .attr("stroke", "lightgray")
@@ -91,12 +111,13 @@ export default {
       let linksText = g
         .append("g")
         .selectAll("text")
-        .data(edges)
+        .data(links)
         .enter()
         .append("text")
         .text(function (d) {
           return d.relation;
-        });
+        })
+        .style("font-size", this.fontSize);
       // 创建分组
       let gs = g
         .selectAll(".circleText")
@@ -124,10 +145,11 @@ export default {
         .attr("dy", 10)
         .text(function (d) {
           return d.name;
-        });
+        })
+        .style("font-size", this.fontSize);
       // ticked
       function ticked() {
-        links
+        glinks
           .attr("x1", function (d) {
             return d.source.x;
           })
@@ -172,6 +194,121 @@ export default {
         d.fy = null;
       }
     },
+
+    svgMouseover(e) {
+      if (e.target.nodeName === "circle") {
+        if (this.pinned.length === 0) {
+          this.selectedState(e);
+        }
+        // 强制刷新
+        this.$forceUpdate();
+        this.$emit("hoverNode", e, e.target.__data__);
+      }
+    },
+
+    svgMouseout(e) {
+      if (e.target.nodeName === "circle") {
+        
+        this.noSelectedState(e);
+        
+        // 强制刷新
+        this.$forceUpdate();
+      }
+    },
+
+    selectedState(e) {
+      // 节点自身显示文字、增加 selected class、添加进 selection
+      // e.target.__data__.showText = true;
+      e.target.classList.add("selected");
+      console.log(e.target.__data__);
+      this.selection.nodes.push(e.target.__data__);
+      // 周围节点显示文字、边和结点增加 selected class、添加进 selection
+      this.lightNeibor(e.target.__data__);
+      // 除了 selected 的其余节点透明度减小
+      console.log(d3.selectAll(".selected"));
+      d3.selectAll(".element").style("opacity", 0.2);
+    },
+
+    noSelectedState(e) {
+      // 节点自身不显示文字、移除 selected class
+      // e.target.__data__.showText = false;
+      e.target.classList.remove("selected");
+      // 周围节点不显示文字、边和结点移除 selected class
+      this.darkenNerbor();
+      // 所有节点透明度恢复
+      d3.selectAll(".element").style("opacity", 1);
+    },
+
+    pinnedState(e) {
+      console.log(e.target);
+      this.pinned.push(e.target.__data__.index);
+      d3.selectAll(".element").style("opacity", 0.05);
+    },
+
+    lightNeibor(node) {
+      this.links.forEach((link) => {
+        console.log(link);
+        if (link.source.index === node.index) {
+          link.classList.add("selected");
+          link.selected = "selected";
+          this.selection.links.push(link);
+          this.selection.nodes.push(link.target);
+          this.lightNode(link.target);
+        }
+        if (link.target.index === node.index) {
+          link.classList.add("selected");
+          link.selected = "selected";
+          this.selection.links.push(link);
+          this.selection.nodes.push(link.source);
+          this.lightNode(link.source);
+        }
+      });
+    },
+
+    lightNode(selectedNode) {
+      this.nodes.forEach((node) => {
+        if (node.index === selectedNode.index) {
+          // node.showText = true;
+        }
+      });
+    },
+
+    darkenNerbor() {
+      this.links.forEach((link) => {
+        this.selection.links.forEach((selectedLink) => {
+          if (selectedLink.id === link.id) {
+            link.selected = "";
+          }
+        });
+      });
+      this.nodes.forEach((node) => {
+        this.selection.nodes.forEach((selectednode) => {
+          if (selectednode.id === node.id) {
+            // node.showText = false;
+          }
+        });
+      });
+      // 清空 selection
+      this.selection.nodes = [];
+      this.selection.links = [];
+    },
+
   },
 };
 </script>
+
+<style scoped>
+svg{
+
+}
+.element {
+  transition: opacity 0.5s ease;
+}
+.selected {
+  opacity: 1 !important;
+}
+.node,
+.link {
+  cursor: pointer;
+}
+</style>

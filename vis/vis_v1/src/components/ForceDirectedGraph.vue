@@ -71,7 +71,7 @@
               :r="nodeSize"
             ></circle>
             <text
-              v-show="node.showText"
+              v-show="allShow?true:node.showText"
               :dx="nodeSize + 5"
               dy="0"
               class="node-text"
@@ -188,6 +188,10 @@ export default {
         return [];
       },
     },
+    allShow : {
+      type: Boolean,
+      default: false,
+    }
   },
 
   data() {
